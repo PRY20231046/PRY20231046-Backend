@@ -9,7 +9,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
     #foundation = models.PositiveIntegerField()
 
 class UserManager(BaseUserManager):
-    def create_user(self, correo, nombres, apellidos, dni, contraseña=None):
+    def create_user(self, correo, nombres, apellidos, dni, password=None):
         if not correo:
             raise ValueError('El campo correo es obligatorio')
         
@@ -18,20 +18,23 @@ class UserManager(BaseUserManager):
             nombres=nombres,
             apellidos=apellidos,
             dni=dni,
+            is_staff=True
         )
         
-        usuario.set_password(contraseña)
+        usuario.set_password(password)
         usuario.save()
         return usuario
     
-    def create_superuser(self, correo, nombres, apellidos, dni, contraseña):
+    def create_superuser(self, correo, nombres, apellidos, dni, password, usuario_administrador=True):
         usuario= self.create_user(
             correo,
             nombres=nombres,
             apellidos=apellidos,
             dni=dni,
+            is_staff=True,
+            password=password
         )
-        usuario.usuario_administrador = True
+        usuario.usuario_administrador = usuario_administrador
         usuario.save()
         return usuario
         
@@ -40,10 +43,11 @@ class Usuario(AbstractBaseUser):
     apellidos=models.CharField(max_length=30)
     dni=models.PositiveBigIntegerField()
     correo=models.EmailField(unique=True)
+    is_staff=models.BooleanField(default=True)
     object = UserManager()
     
     USERNAME_FIELD= 'correo'
-    REQUIRED_FIELDS = ['nombres','apellidos']
+    REQUIRED_FIELDS = ['nombres','apellidos','dni']
     
 class Policia(Usuario):
     rango=models.CharField(max_length=25)

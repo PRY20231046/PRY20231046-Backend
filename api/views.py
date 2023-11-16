@@ -2,7 +2,7 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from .models import Vehiculo
+from .models import Reporte, Vehiculo, Denuncia, Ciudadano
 import json
 # Create your views here.
 
@@ -66,4 +66,108 @@ class VehiculoView(View):
             datos = {'message':"Success"}
         else:
             datos = {'message': "No se encontro vehiculo registrado ..."}
+        return JsonResponse(datos)
+
+class DenunciaView(View):
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, id=0):
+        if (id>0):
+            denuncias = list(Denuncia.objects.filter(id=id).values())
+            if len(denuncias)>0:
+                denuncia = denuncias[0]
+                datos = {'message': "Success", 'denuncia': denuncia}
+            else:
+                datos = {'message': "No se encontro denuncia registrado ..."}
+            return JsonResponse(datos)
+        else:
+            denuncias = list(Denuncia.objects.values())
+            if len(denuncias)>0:
+                datos = {'message': "Success", 'denuncias': denuncias}
+            else:
+                datos = {'message': "No se encontraron denuncias registrados ..."}
+            return JsonResponse(datos)
+    
+    def post(self, request):
+        jd = json.loads(request.body)
+        Denuncia.objects.create(ciudadano=jd['ciudadano'], vehiculo= jd['vehiculo'], fecha_hora=jd['fecha_hora'], descripcion=jd['descripcion'])
+        datos = {'message':"Success"}
+        return JsonResponse(datos)
+    
+    def put(self, request, id):
+        jd = json.loads(request.body)
+        denuncias = list(Denuncia.objects.filter(id=id).values())
+        if len(denuncias)>0:
+            denuncia = Denuncia.objects.get(id=id)
+            denuncia.ciudadano=jd['ciudadano']
+            denuncia.vehiculo= jd['vehiculo'] 
+            denuncia.fecha_hora=jd['fecha_hora'] 
+            denuncia.descripcion=jd['descripcion']
+            datos = {'message':"Success"}
+        else:
+            datos = {'message': "No se encontro denuncia registrado ..."}
+        return JsonResponse(datos)
+    
+    def delete(self, request, id):
+        denuncias = list(Denuncia.objects.filter(id=id).values())
+        if len(denuncias)>0:
+            Vehiculo.objects.filter(id=id).delete()
+            datos = {'message':"Success"}
+        else:
+            datos = {'message': "No se encontro denuncia registrado ..."}
+        return JsonResponse(datos)
+
+class ReporteView(View):
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, id=0):
+        if (id>0):
+            reportes = list(Reporte.objects.filter(id=id).values())
+            if len(reportes)>0:
+                reporte = reportes[0]
+                datos = {'message': "Success", 'reporte': reporte}
+            else:
+                datos = {'message': "No se encontro reporte registrado ..."}
+            return JsonResponse(datos)
+        else:
+            reportes = list(Reporte.objects.values())
+            if len(reportes)>0:
+                datos = {'message': "Success", 'reportes': reportes}
+            else:
+                datos = {'message': "No se encontraron reporte registrados ..."}
+            return JsonResponse(datos)
+    
+    def post(self, request):
+        jd = json.loads(request.body)
+        Reporte.objects.create(policia=jd['policia'], vehiculo= jd['vehiculo'], fecha_hora=jd['fecha_hora'], descripcion=jd['descripcion'])
+        datos = {'message':"Success"}
+        return JsonResponse(datos)
+    
+    def put(self, request, id):
+        jd = json.loads(request.body)
+        reportes = list(Reporte.objects.filter(id=id).values())
+        if len(reportes)>0:
+            reporte = Reporte.objects.get(id=id)
+            reporte.policia=jd['policia']
+            reporte.vehiculo= jd['vehiculo'] 
+            reporte.fecha_hora=jd['fecha_hora'] 
+            reporte.descripcion=jd['descripcion']
+            datos = {'message':"Success"}
+        else:
+            datos = {'message': "No se encontro reporte registrado ..."}
+        return JsonResponse(datos)
+    
+    def delete(self, request, id):
+        reportes = list(Reporte.objects.filter(id=id).values())
+        if len(reportes)>0:
+            Vehiculo.objects.filter(id=id).delete()
+            datos = {'message':"Success"}
+        else:
+            datos = {'message': "No se encontro reporte registrado ..."}
         return JsonResponse(datos)
