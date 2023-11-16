@@ -4,8 +4,32 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from .models import Reporte, Vehiculo, Denuncia, Ciudadano
 import json
+import base64
+import io
+from PIL import Image
+import numpy as np
+import cv2
+import imutils
+import easyocr
 # Create your views here.
+def decodificar_imagen_base64(imagen_base64):
+        
+        try:
+            # Decodifica la cadena base64 en una representación binaria de la imagen
+            imagen_binaria = base64.b64decode(imagen_base64)
+        
+            # Crea un objeto de imagen utilizando la biblioteca Pillow (PIL)
+            imagen = Image.open(io.BytesIO(imagen_binaria))
+        
+            # Convierte la imagen en un arreglo numpy (si es necesario)
+            imagen_numpy = np.array(imagen)
 
+            return imagen_numpy
+        
+        except Exception as e:
+            # Maneja cualquier excepción que pueda ocurrir al decodificar la imagen
+            print(f"Error al decodificar la imagen base64: {str(e)}")
+            return None
 class VehiculoView(View):
     
     @method_decorator(csrf_exempt)
@@ -170,4 +194,48 @@ class ReporteView(View):
             datos = {'message':"Success"}
         else:
             datos = {'message': "No se encontro reporte registrado ..."}
+        return JsonResponse(datos)
+
+class ReconocimientoView(View):
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+        
+    def post(self, request):
+        jd = json.loads(request.body)
+        imagen_codificada = jd['imagen_base64']
+        imagen = decodificar_imagen_base64(imagen_codificada)
+        gray = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+        bfilter = cv2.bilateralFilter(gray, 11, 17, 17)
+        edged = cv2.Canny(bfilter, 30, 200)
+        keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = imutils.grab_contours(keypoints)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+        location = None
+        for contour in contours:
+            approx = cv2.approxPolyDP(contour, 10, True)
+            if len(approx) == 4:
+                location = approx
+                break
+        print(location)
+        mask = np.zeros(gray.shape, np.uint8)
+        new_image = cv2.drawContours(mask, [location], 0,255, -1)
+        new_image = cv2.bitwise_and(imagen, imagen, mask=mask)
+        
+        (x,y) = np.where(mask==255)
+        (x1, y1) = (np.min(x), np.min(y))
+        (x2, y2) = (np.max(x), np.max(y))
+        cropped_image = gray[x1:x2+1, y1:y2+1]
+        reader = easyocr.Reader(['es'])
+        result = reader.readtext(cropped_image)
+        print(result)
+        placa = result[1][-2]
+        
+        if placa:
+            print(placa)
+            datos= {'Placa': placa}
+        else:
+            datos = {'message': "No se encontro codigo de placa"}
+             
         return JsonResponse(datos)
