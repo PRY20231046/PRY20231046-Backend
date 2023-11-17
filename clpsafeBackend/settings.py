@@ -79,11 +79,11 @@ WSGI_APPLICATION = 'clpsafeBackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'clpsafe_db',
-        'HOST': 'roundhouse.proxy.rlwy.net',
-        'PORT': '31025',
-        'USER': 'railway',
-        'PASSWORD': 'ES8f3MYKnpFwQKL~040Erqrdao~voJDn',
+        'NAME': 'railway',
+        'HOST': 'viaduct.proxy.rlwy.net',
+        'PORT': '31032',
+        'USER': 'root',
+        'PASSWORD': '43dFgHb1DeBaFe6hAHgcACh54fBEHAFd',
         'OPTIONS': {
             'init_command':"SET sql_mode='STRICT_TRANS_TABLES'"
         }
