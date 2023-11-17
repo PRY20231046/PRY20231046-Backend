@@ -80,10 +80,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'clpsafe_db',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'USER': 'root',
-        'PASSWORD': 'password',
+        'HOST': 'roundhouse.proxy.rlwy.net',
+        'PORT': '31025',
+        'USER': 'railway',
+        'PASSWORD': 'ES8f3MYKnpFwQKL~040Erqrdao~voJDn',
         'OPTIONS': {
             'init_command':"SET sql_mode='STRICT_TRANS_TABLES'"
         }
