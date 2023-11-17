@@ -4,15 +4,15 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from .models import Reporte, Vehiculo, Denuncia, Ciudadano
 import json
-#import base64
-#import io
-#from PIL import Image
-#import numpy as np
-#import cv2
-#import imutils
-#import easyocr
+import base64
+import io
+from PIL import Image
+import numpy as np
+import cv2
+import imutils
+import easyocr
 # Create your views here.
-'''
+
 def decodificar_imagen_base64(imagen_base64):
         
         try:
@@ -31,7 +31,7 @@ def decodificar_imagen_base64(imagen_base64):
             # Maneja cualquier excepción que pueda ocurrir al decodificar la imagen
             print(f"Error al decodificar la imagen base64: {str(e)}")
             return None
-'''
+
 class VehiculoView(View):
     
     @method_decorator(csrf_exempt)
@@ -198,7 +198,7 @@ class ReporteView(View):
             datos = {'message': "No se encontro reporte registrado ..."}
         return JsonResponse(datos)
 
-'''
+
 class ReconocimientoView(View):
     
     @method_decorator(csrf_exempt)
@@ -242,4 +242,3 @@ class ReconocimientoView(View):
             datos = {'message': "No se encontro codigo de placa"}
              
         return JsonResponse(datos)
-'''
