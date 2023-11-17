@@ -1,0 +1,1 @@
+web: gunicorn clpsafeBackend.wsgi --log-file -
